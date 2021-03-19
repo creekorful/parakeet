@@ -1,0 +1,15 @@
+<html lang="en">
+<head>
+    <title>{{ .Name }}</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<table>
+    {{ range .Messages }}
+        <div>
+            [{{ .Time.Format "2006-01-02 15:04:05" }}] {{ .Sender | colorUsername }} {{ .Content | applyUrl }}
+        </div>
+    {{ end }}
+</table>
+</body>
+</html>
