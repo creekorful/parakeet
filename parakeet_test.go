@@ -17,6 +17,8 @@ const file = `
 [2021-03-01T13:59:00.732Z] <hentiphase> creekorful: https://example.org/manual :)
 [2021-03-01T20:38:26.113Z] *** creekorful (~creekorfu@static.8.8.8.8.clients.example.org) quit ()
 [2021-03-01T21:24:49.669Z] *** hentiphase (~hentiphase@static.4.4.4.4.clients.example.org) quit (Remote host closed the connection)
+[2021-03-23T10:29:59.215Z] *** creekorful (~creekorfu@static.8.8.8.8.clients.example.org) joined
+[2021-03-23T10:46:21.525Z] * creekorful sent a long message:  < something >
 `
 
 func TestParseLog(t *testing.T) {

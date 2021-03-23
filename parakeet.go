@@ -108,8 +108,8 @@ func parseLog(name string, reader io.Reader) (Channel, error) {
 
 		line = strings.TrimSuffix(line, "\n")
 
-		// Only keep 'message' line i.e which contains something like '<username>'
-		if !strings.Contains(line, "<") || !strings.Contains(line, ">") {
+		// Only keep 'message' line i.e which contains something like '] <username>'
+		if !strings.Contains(line, "] <") || !strings.Contains(line, ">") {
 			continue
 		}
 
