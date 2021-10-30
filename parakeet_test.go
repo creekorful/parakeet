@@ -87,6 +87,21 @@ func TestGenerateHTML(t *testing.T) {
 	}
 }
 
+func BenchmarkGenerateHTML(b *testing.B) {
+	w := &strings.Builder{}
+
+	for n := 0; n < b.N; n++ {
+		ch, err := parseLog("#test-channel", strings.NewReader(file))
+		if err != nil {
+			b.Fatal(err)
+		}
+
+		if err := generateHTML(ch, w); err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
 func TestTrimSuffixes(t *testing.T) {
 	if val := trimSuffixes("#test-channel.txt", []string{".txt", ".log"}); val != "#test-channel" {
 		t.Fail()
@@ -97,15 +112,4 @@ func TestTrimSuffixes(t *testing.T) {
 	if val := trimSuffixes("#test-channel.bin", []string{".txt", ".log"}); val != "#test-channel.bin" {
 		t.Fail()
 	}
-}
-
-func TestContext_ApplyURL(t *testing.T) {
-	ctx := Context{}
-	if val := ctx.applyURL("hello https://blog.example.org/test :D"); val != "hello <a href=\"https://blog.example.org/test\">https://blog.example.org/test</a> :D" {
-		t.Fail()
-	}
-}
-
-func TestContext_ColorUsername(t *testing.T) {
-	// TODO
 }

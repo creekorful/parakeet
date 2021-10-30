@@ -1,12 +1,12 @@
 package main
 
 import (
-	"bufio"
 	_ "embed"
 	"flag"
 	"fmt"
 	"html/template"
 	"io"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"mvdan.cc/xurls/v2"
@@ -68,7 +68,7 @@ func main() {
 	log.Printf("Sucessfully generated HTML template at: %s", *outputFileFlag)
 }
 
-func generateHTML(ch Channel, writer io.Writer) error {
+func generateHTML(ch *Channel, writer io.Writer) error {
 	ctx := Context{
 		Colors: []string{
 			"red", "green", "blue", "violet", "turquoise",
@@ -80,7 +80,6 @@ func generateHTML(ch Channel, writer io.Writer) error {
 
 	tpl, err := template.New("channel").
 		Funcs(map[string]interface{}{
-			"applyUrl":      ctx.applyURL,
 			"colorUsername": ctx.colorUsername,
 		}).
 		Parse(tplStr)
@@ -91,23 +90,21 @@ func generateHTML(ch Channel, writer io.Writer) error {
 	return tpl.Execute(writer, ch)
 }
 
-func parseLog(name string, reader io.Reader) (Channel, error) {
-	ch := Channel{
+func parseLog(name string, reader io.Reader) (*Channel, error) {
+	ch := &Channel{
 		Name:     name,
 		Messages: []Message{},
 	}
 
-	rd := bufio.NewReader(reader)
-	var line string
-	var err error
-	for {
-		line, err = rd.ReadString('\n')
-		if err != nil {
-			break
-		}
+	b, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return nil, err
+	}
 
-		line = strings.TrimSuffix(line, "\n")
+	// Replace all URLs in one pass
+	content := applyURLs(string(b))
 
+	for _, line := range strings.Split(content, "\n") {
 		// Only keep 'message' line i.e which contains something like '] <username>'
 		if !strings.Contains(line, "] <") || !strings.Contains(line, ">") {
 			continue
@@ -130,10 +127,6 @@ func parseLog(name string, reader io.Reader) (Channel, error) {
 		})
 	}
 
-	if err != io.EOF {
-		return Channel{}, err
-	}
-
 	return ch, nil
 }
 
@@ -145,11 +138,11 @@ func trimSuffixes(s string, suffixes []string) string {
 	return s
 }
 
-func (c *Context) applyURL(s string) template.HTML {
+func applyURLs(s string) string {
 	rxStrict := xurls.Strict()
-	return template.HTML(rxStrict.ReplaceAllStringFunc(s, func(s string) string {
+	return rxStrict.ReplaceAllStringFunc(s, func(s string) string {
 		return fmt.Sprintf("<a href=\"%s\">%s</a>", s, s)
-	}))
+	})
 }
 
 func (c *Context) colorUsername(s string) template.HTML {
