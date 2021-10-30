@@ -44,13 +44,23 @@ func main() {
 
 	flag.Parse()
 
+	if *inputFileFlag == "" {
+		log.Fatalf("missing -input")
+	}
+
+	channelName := trimSuffixes(filepath.Base(*inputFileFlag), []string{".txt", ".log"})
+
+	if *outputFileFlag == "" {
+		*outputFileFlag = channelName + ".html"
+	}
+
 	inputFile, err := os.Open(*inputFileFlag)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer inputFile.Close()
 
-	ch, err := parseLog(trimSuffixes(filepath.Base(*inputFileFlag), []string{".txt", ".log"}), inputFile)
+	ch, err := parseLog(channelName, inputFile)
 	if err != nil {
 		panic(err)
 	}
