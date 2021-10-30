@@ -54,7 +54,7 @@ func TestParseLog(t *testing.T) {
 	if msg.Sender != "hentiphase" {
 		t.Fail()
 	}
-	if msg.Content != "creekorful: https://example.org/manual :)" {
+	if msg.Content != "creekorful: <a href=\"https://example.org/manual\">https://example.org/manual</a> :)" {
 		t.Fail()
 	}
 }
@@ -74,9 +74,6 @@ func TestGenerateHTML(t *testing.T) {
 	val := w.String()
 
 	if !strings.Contains(val, "<title>#test-channel</title>") {
-		t.Fail()
-	}
-	if !strings.Contains(val, "<a href=\"https://example.org/manual\">https://example.org/manual</a>") {
 		t.Fail()
 	}
 	if !strings.Contains(val, "; font-weight: bold;\">creekorful</span>&gt;") {
